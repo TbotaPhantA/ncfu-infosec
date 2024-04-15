@@ -1,6 +1,10 @@
 ﻿#include <iostream>
 
+void labrab6() {
+    std::cout << "labrab6";
+}
+
 int main()
 {
-    std::cout << "Hello World!\n";
+    labrab6();
 }
