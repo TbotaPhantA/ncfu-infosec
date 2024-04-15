@@ -4,36 +4,81 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <random>
 
 using namespace std;
 
-enum class Permission { READ, WRITE, GRANT };
+enum class Permission {
+    READ,
+    WRITE,
+    GRANT
+};
 
-// Function to check if a permission exists in the list
+std::vector<Permission> get_random_permissions() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> size_dist(0, 3);
+
+    int num_permissions = size_dist(gen);
+    std::vector<Permission> permissions;
+    for (int i = 0; i < num_permissions; ++i) {
+        std::uniform_int_distribution<int> dist(1, static_cast<int>(Permission::GRANT));
+        Permission permission(static_cast<Permission>(dist(gen)));
+        if (std::any_of(permissions.begin(), permissions.end(),
+            [&permission](const Permission& p) { return p == permission; })) {
+            continue;
+        }
+        permissions.push_back(permission);
+    }
+    return permissions;
+}
+
+std::string permission_to_string(Permission permission) {
+    switch (permission) {
+		case Permission::READ:
+			return "READ";
+		case Permission::WRITE:
+			return "WRITE";
+		case Permission::GRANT:
+			return "GRANT";
+		default:
+			return "UNKNOWN";
+    }
+}
+
 bool hasPermission(const vector<Permission>& permissions, Permission permission) {
     return find(permissions.begin(), permissions.end(), permission) != permissions.end();
 }
 
-// User class to store username and permissions
 class User {
 public:
     string username;
-    vector<vector<vector<Permission>>> permissions;
+    vector<vector<Permission>> permissions;
 
     User(const string& username, bool isAdmin = false) : username(username) {
         permissions.resize(3);
         for (int i = 0; i < 3; ++i) {
             permissions[i].resize(3);
             if (isAdmin) {
-                for (int j = 0; j < 3; ++j) {
-                    permissions[i][j] = { Permission::READ, Permission::WRITE, Permission::GRANT };
-                }
+				permissions[i] = { Permission::READ, Permission::WRITE, Permission::GRANT };
+            } else {
+				permissions[i] = get_random_permissions();
             }
+        }
+    }
+
+    void print_permissions() const {
+        std::cout << "User: " << username << std::endl;
+        for (int i = 0; i < 3; ++i) {
+            std::cout << "Object " << i + 1 << ": ";
+			for (const auto& permission : permissions[i]) {
+				std::cout << permission_to_string(permission) << " ";
+			}
+            std::cout << endl;
         }
     }
 };
 
-// Function to find the user object by username
 User* findUser(const string& username, vector<User>& users) {
     for (User& user : users) {
         if (user.username == username) {
@@ -56,6 +101,8 @@ int labrab6() {
         cout << "Invalid username." << endl;
         return 1;
     }
+
+    currentUser->print_permissions();
 
     int object, action;
     while (true) {
@@ -88,7 +135,7 @@ int labrab6() {
             continue;
         }
 
-        if (hasPermission(currentUser->permissions[object - 1][0], permission)) {
+        if (hasPermission(currentUser->permissions[object - 1], permission)) {
             cout << "Permission granted for object " << object << endl;
         }
         else {
