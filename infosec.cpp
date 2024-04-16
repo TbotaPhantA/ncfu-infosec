@@ -146,7 +146,28 @@ int labrab6() {
     return 0;
 }
 
+int labrab7() {
+    const int num_strings = 10;
+    const int string_length = 7;
+    std::string lowercase_letters("abcdefghijklmnopqrstuvwxyz");
+
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(0, lowercase_letters.size() - 1);
+
+    for (int i = 0; i < num_strings; ++i) {
+        std::string passwords;
+        for (int j = 0; j < string_length; ++j) {
+            int random_index = distribution(generator);
+            passwords += lowercase_letters[random_index];
+        }
+        std::cout << passwords << std::endl;
+    }
+    return 0;
+}
+
 int main()
 {
-    return labrab6();
+//    return labrab6();
+    return labrab7();
 }
