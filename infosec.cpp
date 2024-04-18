@@ -1,10 +1,13 @@
 ﻿#include <iostream>
-
-#include <iostream>
-#include <string>
+#include <dirent.h>
 #include <vector>
+#include <string>
 #include <unordered_map>
 #include <random>
+#include <cmath>
+#include <algorithm> // for std::fill
+#include <numeric>
+
 
 using namespace std;
 
@@ -166,8 +169,169 @@ int labrab7() {
     return 0;
 }
 
-int main()
+// ------------------------------------------------------
+// ------------------------------------------------------
+// ---------------------LABRAB 8-------------------------
+// ------------------------------------------------------
+// ------------------------------------------------------
+
+#include<iostream>
+#include<stdlib.h>
+#include<math.h>
+#include<string.h>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
+
+int x, y, n, t, i, flag;
+long int e[50], d[50], temp[50], j;
+char en[50], m[50];
+char msg[100];
+int prime(long int);
+void encryption_key();
+long int cd(long int);
+void encrypt();
+void decrypt();
+
+int labrab8()
 {
-//    return labrab6();
-    return labrab7();
+    x = 7;
+    y = 13;
+    std::ifstream inputFile("text.txt");
+    string line;
+    std::getline(inputFile, line);
+    for (int i = 0; i < line.size(); i++) {
+        msg[i] = line[i];
+    }
+
+    for (i = 0; msg[i] != NULL; i++)
+        m[i] = msg[i];
+    n = x * y;
+    t = (x - 1) * (y - 1);
+
+    encryption_key();
+    cout << "\nPOSSIBLE VALUES OF e AND d ARE\n";
+
+    for (i = 0; i < j - 1; i++)
+        cout << "\n" << e[i] << "\t" << d[i];
+
+    encrypt();
+    decrypt();
+    return 0;
+} //end of the main program
+
+int prime(long int pr)
+{
+    int i;
+    j = sqrt(pr);
+    for (i = 2; i <= j; i++)
+    {
+        if (pr % i == 0)
+            return 0;
+    }
+    return 1;
+}
+
+//function to generate encryption key
+void encryption_key()
+{
+    int k;
+    k = 0;
+    for (i = 2; i < t; i++)
+    {
+        if (t % i == 0)
+            continue;
+        flag = prime(i);
+        if (flag == 1 && i != x && i != y)
+        {
+            e[k] = i;
+            flag = cd(e[k]);
+            if (flag > 0)
+            {
+                d[k] = flag;
+                k++;
+            }
+            if (k == 99)
+                break;
+        }
+    }
+}
+
+long int cd(long int a)
+{
+    long int k = 1;
+    while (1)
+    {
+        k = k + t;
+        if (k % a == 0)
+            return(k / a);
+    }
+}
+
+//function to encrypt the message
+void encrypt()
+{
+    long int pt, ct, key = e[0], k, len;
+    i = 0;
+    len = strlen(msg);
+
+    while (i != len)
+    {
+        pt = m[i];
+        pt = pt - 96;
+        k = 1;
+        for (j = 0; j < key; j++)
+        {
+            k = k * pt;
+            k = k % n;
+        }
+        temp[i] = k;
+        ct = k + 96;
+        en[i] = ct;
+        i++;
+    }
+    en[i] = -1;
+    string encrypted_str;
+    for (i = 0; en[i] != -1; i++)
+        encrypted_str.push_back(en[i]);
+    std::ofstream outputFile1("encrypted_text.txt");
+    outputFile1 << encrypted_str << endl;
+}
+
+//function to decrypt the message
+void decrypt()
+{
+    long int pt, ct, key = d[0], k;
+    i = 0;
+    while (en[i] != -1)
+    {
+        ct = temp[i];
+        k = 1;
+        for (j = 0; j < key; j++)
+        {
+            k = k * ct;
+            k = k % n;
+        }
+        pt = k + 96;
+        m[i] = pt;
+        i++;
+    }
+    m[i] = -1;
+    string decrypted_str;
+    for (i = 0; m[i] != -1; i++)
+        decrypted_str.push_back(m[i]);
+    std::ofstream outputFile2("decrypted_text.txt");
+    outputFile2 << decrypted_str << endl;
+}
+
+
+int main(int argc, char* argv[])
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    // return labrab6();
+    // return labrab7();
+    return labrab8();
 }
