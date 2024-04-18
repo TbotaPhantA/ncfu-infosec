@@ -219,7 +219,7 @@ int labrab8()
     encrypt();
     decrypt();
     return 0;
-} //end of the main program
+}
 
 int prime(long int pr)
 {
@@ -233,7 +233,6 @@ int prime(long int pr)
     return 1;
 }
 
-//function to generate encryption key
 void encryption_key()
 {
     int k;
@@ -269,7 +268,6 @@ long int cd(long int a)
     }
 }
 
-//function to encrypt the message
 void encrypt()
 {
     long int pt, ct, key = e[0], k, len;
@@ -299,7 +297,6 @@ void encrypt()
     outputFile1 << encrypted_str << endl;
 }
 
-//function to decrypt the message
 void decrypt()
 {
     long int pt, ct, key = d[0], k;
