@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
 #include <dirent.h>
 #include <vector>
 #include <string>
@@ -178,7 +179,7 @@ int labrab7() {
 #include<iostream>
 #include<stdlib.h>
 #include<math.h>
-#include<string.h>
+#include <string.h>
 #include <fstream>
 #include <iostream>
 
@@ -322,6 +323,95 @@ void decrypt()
     outputFile2 << decrypted_str << endl;
 }
 
+// -----------------------LABRAB 9-------------------------------------
+#include <stdio.h>
+#include <Windows.h>
+#include <Iphlpapi.h>
+#include <Assert.h>
+#pragma comment(lib, "iphlpapi.lib")
+
+string getMAC() {
+    PIP_ADAPTER_INFO AdapterInfo;
+    DWORD dwBufLen = sizeof(IP_ADAPTER_INFO);
+    char* mac_addr = (char*)malloc(18);
+
+    AdapterInfo = (IP_ADAPTER_INFO*)malloc(sizeof(IP_ADAPTER_INFO));
+    if (AdapterInfo == NULL) {
+        // printf("Error allocating memory needed to call GetAdaptersinfo\n");
+        free(mac_addr);
+        return NULL; // it is safe to call free(NULL)
+    }
+
+    // Make an initial call to GetAdaptersInfo to get the necessary size into the dwBufLen variable
+    if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == ERROR_BUFFER_OVERFLOW) {
+        free(AdapterInfo);
+        AdapterInfo = (IP_ADAPTER_INFO*)malloc(dwBufLen);
+        if (AdapterInfo == NULL) {
+            // printf("Error allocating memory needed to call GetAdaptersinfo\n");
+            free(mac_addr);
+            return NULL;
+        }
+    }
+
+    if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == NO_ERROR) {
+        // Contains pointer to current adapter info
+        PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;
+        do {
+            // technically should look at pAdapterInfo->AddressLength
+            //   and not assume it is 6.
+            sprintf(mac_addr, "%02X:%02X:%02X:%02X:%02X:%02X",
+                pAdapterInfo->Address[0], pAdapterInfo->Address[1],
+                pAdapterInfo->Address[2], pAdapterInfo->Address[3],
+                pAdapterInfo->Address[4], pAdapterInfo->Address[5]);
+            // printf("Address: %s, mac: %s\n", pAdapterInfo->IpAddressList.IpAddress.String, mac_addr);
+            // print them all, return the last one.
+            // return mac_addr;
+
+            // printf("\n");
+            pAdapterInfo = pAdapterInfo->Next;
+        } while (pAdapterInfo);
+    }
+    free(AdapterInfo);
+    return (string)mac_addr; // caller must free.
+}
+
+int getDiskSerialNumber() {
+    TCHAR szVolName[256];
+    DWORD currentDiskSerialNumber;
+    DWORD dwMaxComSize;
+    DWORD dwFlags;
+    TCHAR szFS[256];
+    BOOL bRes;
+    string volumeStr = "c:\\";
+    std::wstring stemp = std::wstring(volumeStr.begin(), volumeStr.end());
+    LPCWSTR volume = stemp.c_str();
+    bRes = GetVolumeInformation(volume, szVolName, sizeof(szVolName), &currentDiskSerialNumber,
+        &dwMaxComSize, &dwFlags, szFS, sizeof(szFS));
+    return currentDiskSerialNumber;
+}
+
+int labrab9()
+{
+
+    int allowedDiskSerialNumber = 12341234;
+    int currentDiskSerialNumber = getDiskSerialNumber();
+
+    string allowedMacAdress = "A5:D7:F9:B9:C9:44";
+    string currentMacAddress = getMAC();
+
+    bool canExecute =
+        allowedMacAdress == currentMacAddress &&
+        allowedDiskSerialNumber == currentDiskSerialNumber;
+
+    if (!canExecute) {
+        cout << "Cannot execute the program..." << endl;
+    }
+
+    cout << "Executing the program" << endl;
+
+    return 0;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -330,5 +420,6 @@ int main(int argc, char* argv[])
 
     // return labrab6();
     // return labrab7();
-    return labrab8();
+    // return labrab8();
+    return labrab9();
 }
